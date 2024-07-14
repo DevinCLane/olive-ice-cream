@@ -10,9 +10,14 @@ canvas.height = window.innerHeight;
 class Particle {
     constructor(effect) {
         this.effect = effect;
-        this.x = Math.random() * this.effect.width;
-        this.y = Math.random() * this.effect.height;
         this.radius = 15;
+        // keep every circle within the canvas
+        this.x =
+            this.radius + Math.random() * (this.effect.width - this.radius * 2);
+        this.y =
+            this.radius +
+            Math.random() * (this.effect.height - this.radius * 2);
+        ctx.strokeStyle = `oklch(100% 0 ${this.x / 0.5})`;
     }
 
     /**
@@ -24,6 +29,7 @@ class Particle {
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         context.fill();
+        context.stroke();
     }
 }
 
