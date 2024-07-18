@@ -9,14 +9,17 @@ canvas.height = window.innerHeight;
 class Particle {
     constructor(effect) {
         this.effect = effect;
-        this.radius = 15;
+        ctx.strokeStyle = `oklch(100% 0 0)`;
+        this.radius = Math.random() * 30 + 5;
         // keep every circle within the canvas
         this.x =
             this.radius + Math.random() * (this.effect.width - this.radius * 2);
         this.y =
             this.radius +
             Math.random() * (this.effect.height - this.radius * 2);
-        ctx.strokeStyle = `oklch(100% 0 ${this.x / 0.5})`;
+        // velocity on horizontal axis
+        this.vx = Math.random() * 2 - 1;
+        this.vy = Math.random() * 2 - 1;
     }
 
     /**
@@ -24,11 +27,23 @@ class Particle {
      * @param {CanvasRenderingContext2D} context
      */
     draw(context) {
-        context.fillStyle = `oklch(70% 0.1 ${this.x * 0.5})`;
+        context.fillStyle = `oklch(70% 0.1 ${this.x * 0.8})`;
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         context.fill();
         context.stroke();
+    }
+
+    update() {
+        this.x += this.vx;
+        // make balls bounce off the side
+        // if we are outside the bounds of the canvas, flip the x velocity
+        if (this.x > this.effect.width - this.radius || this.x < this.radius)
+            this.vx *= -1;
+
+        this.y += this.vy;
+        if (this.y > this.effect.width - this.radius || this.y < this.radius)
+            this.vy *= -1;
     }
 }
 
@@ -51,11 +66,16 @@ class Effect {
     handleParticles(context) {
         this.particles.forEach((particle) => {
             particle.draw(context);
+            particle.update();
         });
     }
 }
 
 const effect = new Effect(canvas);
-effect.handleParticles(ctx);
 
-function animate() {}
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    effect.handleParticles(ctx);
+    requestAnimationFrame(animate);
+}
+animate();
